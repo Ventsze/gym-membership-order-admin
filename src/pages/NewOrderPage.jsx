@@ -60,6 +60,22 @@ export function NewOrderPage() {
           <Text type="secondary">录入会员与办卡信息，提交后订单将进入待审核。</Text>
         </div>
       </div>
+      <div className="creation-progress" aria-label="订单创建流程">
+        <div className="creation-step active">
+          <span>1</span>
+          <strong>填写资料</strong>
+        </div>
+        <i />
+        <div className="creation-step">
+          <span>2</span>
+          <strong>生成订单</strong>
+        </div>
+        <i />
+        <div className="creation-step">
+          <span>3</span>
+          <strong>进入审核</strong>
+        </div>
+      </div>
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={16}>
           <Card className="surface-card form-card" title="会员与套餐信息">

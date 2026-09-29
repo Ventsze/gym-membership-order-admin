@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
+  CalendarOutlined,
   CloseOutlined,
   FileAddOutlined,
   LogoutOutlined,
@@ -35,6 +36,15 @@ export function AdminLayout() {
     () => [{ title: '会员订单' }, { title: pageNames[location.pathname] || '页面' }],
     [location.pathname],
   )
+  const todayLabel = useMemo(
+    () =>
+      new Intl.DateTimeFormat('zh-CN', {
+        month: 'long',
+        day: 'numeric',
+        weekday: 'short',
+      }).format(new Date()),
+    [],
+  )
 
   const handleLogout = () => {
     logout()
@@ -56,10 +66,11 @@ export function AdminLayout() {
             <TrophyOutlined />
           </div>
           <div>
-            <div className="brand-name">跃动会员管理</div>
-            <div className="brand-subtitle">MEMBER OPERATIONS</div>
+            <div className="brand-name">跃动</div>
+            <div className="brand-subtitle">MEMBER STUDIO</div>
           </div>
         </div>
+        <div className="sider-section-label">工作台</div>
         <Menu
           mode="inline"
           selectedKeys={[selectedKey]}
@@ -94,6 +105,10 @@ export function AdminLayout() {
             onClick={() => setMobileMenuOpen((value) => !value)}
           />
           <Breadcrumb items={breadcrumbItems} className="page-breadcrumb" />
+          <div className="header-date">
+            <CalendarOutlined />
+            <span>{todayLabel}</span>
+          </div>
           <Dropdown
             menu={{
               items: [

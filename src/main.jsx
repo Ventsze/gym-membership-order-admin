@@ -18,13 +18,20 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           colorWarning: '#ff9500',
           colorError: '#ff3b30',
           borderRadius: 10,
+          colorBgLayout: '#f5f5f7',
+          colorBorder: '#e5e5ea',
           fontFamily:
             "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', sans-serif",
         },
         components: {
-          Button: { controlHeight: 38, fontWeight: 500 },
+          Button: { controlHeight: 38, fontWeight: 550, primaryShadow: 'none' },
           Input: { controlHeight: 40 },
-          Table: { headerBg: '#f5f5f7', headerColor: '#6e6e73' },
+          Table: {
+            headerBg: '#fafafa',
+            headerColor: '#6e6e73',
+            headerSplitColor: 'transparent',
+            rowHoverBg: '#f7f7f8',
+          },
         },
       }}
     >

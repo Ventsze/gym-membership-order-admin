@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   CloseCircleOutlined,
   DownloadOutlined,
@@ -35,6 +35,11 @@ import { exportOrdersToCsv } from '../utils/csv'
 import { formatMoney } from '../utils/format'
 
 const { Text, Title } = Typography
+const IN_PROGRESS_STATUSES = [
+  ORDER_STATUS.PENDING_REVIEW,
+  ORDER_STATUS.PENDING_CARD,
+  ORDER_STATUS.PENDING_MAIL,
+]
 
 export function OrdersPage() {
   const [form] = Form.useForm()
@@ -47,6 +52,15 @@ export function OrdersPage() {
   const [renewOrders, setRenewOrders] = useState([])
   const [renewing, setRenewing] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const pageOverview = useMemo(
+    () => ({
+      amount: data.reduce((sum, order) => sum + (Number(order.amount) || 0), 0),
+      inProgress: data.filter((order) => IN_PROGRESS_STATUSES.includes(order.status))
+        .length,
+      renewable: data.filter((order) => order.status === RENEWABLE_STATUS).length,
+    }),
+    [data],
+  )
 
   useEffect(() => {
     data.forEach((order) => {
@@ -289,12 +303,41 @@ export function OrdersPage() {
         <Button
           type="primary"
           size="large"
+          className="hero-create-button"
           icon={<PlusOutlined />}
           onClick={() => navigate('/orders/new')}
         >
           新建订单
         </Button>
       </div>
+
+      <section className="overview-strip" aria-label="当前订单概览">
+        <div className="overview-intro">
+          <span className="overview-kicker">LIVE OVERVIEW</span>
+          <strong>当前订单概览</strong>
+          <small>数据随筛选条件实时更新</small>
+        </div>
+        <div className="overview-metric">
+          <span>当前结果</span>
+          <strong>{total}</strong>
+          <small>笔订单</small>
+        </div>
+        <div className="overview-metric">
+          <span>本页金额</span>
+          <strong className="metric-money">¥ {formatMoney(pageOverview.amount)}</strong>
+          <small>当前页合计</small>
+        </div>
+        <div className="overview-metric">
+          <span>本页进行中</span>
+          <strong>{pageOverview.inProgress}</strong>
+          <small>待审核 / 制卡 / 寄卡</small>
+        </div>
+        <div className="overview-metric accent">
+          <span>本页可续卡</span>
+          <strong>{pageOverview.renewable}</strong>
+          <small>已到期订单</small>
+        </div>
+      </section>
 
       <Card className="surface-card filter-card">
         <Tabs activeKey={query.statusGroup} items={STATUS_TABS} onChange={changeTab} />
@@ -320,20 +363,26 @@ export function OrdersPage() {
 
       <Card className="surface-card table-card">
         <div className="table-toolbar">
-          <Space wrap>
-            <Button onClick={() => openRenewModal(selectedOrders)}>批量续卡</Button>
-            <Button danger onClick={() => cancelOrders(selectedOrders)}>
-              一键撤单
-            </Button>
-            {selectedRowKeys.length > 0 && (
-              <Text type="secondary">
-                已跨页选择 <Text strong>{selectedRowKeys.length}</Text> 项
-                <Button type="link" onClick={clearSelection}>
-                  清空
-                </Button>
-              </Text>
-            )}
-          </Space>
+          <div className="table-toolbar-main">
+            <div className="table-title-block">
+              <strong>订单明细</strong>
+              <span>共 {total} 笔</span>
+            </div>
+            <Space wrap>
+              <Button onClick={() => openRenewModal(selectedOrders)}>批量续卡</Button>
+              <Button danger onClick={() => cancelOrders(selectedOrders)}>
+                一键撤单
+              </Button>
+              {selectedRowKeys.length > 0 && (
+                <Text type="secondary">
+                  已跨页选择 <Text strong>{selectedRowKeys.length}</Text> 项
+                  <Button type="link" onClick={clearSelection}>
+                    清空
+                  </Button>
+                </Text>
+              )}
+            </Space>
+          </div>
           <Tooltip title="仅导出当前筛选下的已完成、已到期订单">
             <Button
               icon={<DownloadOutlined />}
