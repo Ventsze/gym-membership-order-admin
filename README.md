@@ -1,6 +1,10 @@
 # 跃动健身会员订单管理后台
 
+[![CI](https://github.com/Ventsze/gym-membership-order-admin/actions/workflows/ci.yml/badge.svg)](https://github.com/Ventsze/gym-membership-order-admin/actions/workflows/ci.yml)
+
 一个基于 React 18 + Vite 构建的健身房会员办卡订单管理后台。项目覆盖登录鉴权、订单筛选与分页、新建订单、跨页批量续卡、一键撤单，以及面向财务对账的受限 CSV 导出。
+
+公开仓库：[github.com/Ventsze/gym-membership-order-admin](https://github.com/Ventsze/gym-membership-order-admin)
 
 ## 项目预览
 
