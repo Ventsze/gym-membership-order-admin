@@ -19,9 +19,27 @@ npm run dev
 npm run lint          # ESLint 代码检查
 npm run format:check  # Prettier 格式检查
 npm run format        # 自动格式化
+npm test              # 单次运行自动化测试
+npm run test:watch    # 开发时监听相关测试
+npm run test:coverage # 生成覆盖率报告
+npm run check         # 一次执行 lint、格式、测试与构建
 npm run build         # 生产构建
 npm run preview       # 本地预览生产构建
 ```
+
+## 自动化测试与持续集成
+
+项目使用 Vitest + React Testing Library，测试按职责分为三层：
+
+- 纯函数测试：覆盖金额格式化、手机号格式化，以及续卡 5 年折扣边界；
+- 服务测试：覆盖 36 条初始数据、分页与状态筛选、新建、续卡、撤单、鉴权和写接口校验；
+- 用户行为测试：覆盖受保护路由、404、订单 Tab 筛选、续卡弹窗实时计费，以及快速查询时的请求竞态。
+
+`npm test` 会在命令行一次性执行全部测试。`npm run test:watch` 适合开发过程，会在文件修改后只重跑相关用例。`npm run test:coverage` 会在 `coverage/` 生成 HTML 报告，可打开 `coverage/index.html` 查看每一行的覆盖情况。
+
+覆盖率配置包含质量门槛：语句和行覆盖率不低于 60%，分支不低于 75%，函数不低于 50%。低于门槛时命令和 CI 会直接失败，避免覆盖率在后续迭代中无声下降。
+
+仓库包含 `.github/workflows/ci.yml`。推送到 GitHub 或创建 Pull Request 时，CI 会自动执行 `npm ci` 和 `npm run check`，任何格式、Lint、测试或构建失败都会阻止质量检查通过。
 
 ## 技术栈
 
@@ -137,6 +155,9 @@ Zustand 只保存真正的全局状态：token、用户名及登录/退出动作
 - 列表请求、分页、Tab 切换、搜索与刷新抽象为 `useOrderList`。
 - 批量选择支持跨页保留，并可一键清空。
 - Mock 层保留真实 Axios 请求链路，前端和接口层均做业务校验。
+- 查询使用 AbortController 与请求序号防止快速切换筛选时旧响应覆盖新结果。
+- 路由页面按需加载，并对 React、请求层依赖做稳定分包。
+- CSV 对 `= + - @` 等公式前缀进行转义，降低表格软件公式注入风险。
 - 页面包含加载、空结果、校验失败、成功提示、二次确认和 404 状态。
 - 布局对桌面与窄屏做了响应式适配，并提供自定义 Ant Design 主题与 favicon。
 - 关键业务常量、计费函数、金额格式化和 CSV 序列化均集中管理。

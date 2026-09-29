@@ -56,6 +56,11 @@ export function OrdersPage() {
     })
   }, [data, selectedRowKeys])
 
+  useEffect(() => {
+    selectionCache.current.clear()
+    setSelectedRowKeys([])
+  }, [query.statusGroup, query.orderNo, query.memberName])
+
   const selectedOrders = selectedRowKeys
     .map((key) => selectionCache.current.get(key))
     .filter(Boolean)

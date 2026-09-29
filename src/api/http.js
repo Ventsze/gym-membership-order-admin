@@ -19,6 +19,9 @@ http.interceptors.request.use((config) => {
 http.interceptors.response.use(
   (response) => response.data.data,
   (error) => {
+    if (axios.isCancel(error) || error.code === 'ERR_CANCELED') {
+      return Promise.reject(error)
+    }
     const status = error.response?.status
     const errorMessage =
       error.response?.data?.message || error.message || '请求失败，请稍后重试'

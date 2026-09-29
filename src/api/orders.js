@@ -1,8 +1,8 @@
 import http from './http'
 
 export const orderApi = {
-  list(params) {
-    return http.get('/orders', { params })
+  list(params, config = {}) {
+    return http.get('/orders', { ...config, params })
   },
   create(payload) {
     return http.post('/orders', payload)

@@ -2,12 +2,13 @@ import dayjs from 'dayjs'
 import { ORDER_STATUS_META } from '../constants/order'
 import { formatMoney } from './format'
 
-function escapeCsv(value) {
+export function escapeCsv(value, protectFormula = false) {
   const text = String(value ?? '')
-  return `"${text.replaceAll('"', '""')}"`
+  const safeText = protectFormula && /^[\t\r ]*[=+\-@]/.test(text) ? `'${text}` : text
+  return `"${safeText.replaceAll('"', '""')}"`
 }
 
-export function exportOrdersToCsv(orders) {
+export function createOrdersCsv(orders) {
   const headers = [
     '订单号',
     '会员姓名',
@@ -19,17 +20,23 @@ export function exportOrdersToCsv(orders) {
     '备注',
   ]
   const rows = orders.map((order) => [
-    order.orderNo,
-    order.memberName,
-    order.phone,
-    order.years,
-    formatMoney(order.amount),
-    ORDER_STATUS_META[order.status]?.label ?? order.status,
-    order.createdAt,
-    order.remark,
+    escapeCsv(order.orderNo, true),
+    escapeCsv(order.memberName, true),
+    escapeCsv(order.phone, true),
+    escapeCsv(order.years),
+    escapeCsv(formatMoney(order.amount)),
+    escapeCsv(ORDER_STATUS_META[order.status]?.label ?? order.status, true),
+    escapeCsv(order.createdAt),
+    escapeCsv(order.remark, true),
   ])
 
-  const csv = [headers, ...rows].map((row) => row.map(escapeCsv).join(',')).join('\r\n')
+  return [headers.map((value) => escapeCsv(value)), ...rows]
+    .map((row) => row.join(','))
+    .join('\r\n')
+}
+
+export function exportOrdersToCsv(orders) {
+  const csv = createOrdersCsv(orders)
   const blob = new Blob([`\uFEFF${csv}`], {
     type: 'text/csv;charset=utf-8;',
   })

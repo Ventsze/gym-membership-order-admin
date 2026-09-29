@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { orderApi } from '../api/orders'
 
 const initialQuery = {
@@ -15,21 +15,28 @@ export function useOrderList() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
-
-  const fetchOrders = useCallback(async () => {
-    setLoading(true)
-    try {
-      const result = await orderApi.list(query)
-      setData(result.list)
-      setTotal(result.total)
-    } finally {
-      setLoading(false)
-    }
-  }, [query])
+  const requestSequence = useRef(0)
 
   useEffect(() => {
-    fetchOrders()
-  }, [fetchOrders, refreshKey])
+    const requestId = ++requestSequence.current
+    const controller = new AbortController()
+    setLoading(true)
+    orderApi
+      .list(query, { signal: controller.signal })
+      .then((result) => {
+        if (requestId !== requestSequence.current) return
+        setData(result.list)
+        setTotal(result.total)
+      })
+      .catch(() => {
+        // 错误提示由 Axios 响应拦截器统一处理；取消请求无需额外反馈。
+      })
+      .finally(() => {
+        if (requestId === requestSequence.current) setLoading(false)
+      })
+
+    return () => controller.abort()
+  }, [query, refreshKey])
 
   const changeTab = (statusGroup) => {
     setQuery((current) => ({ ...current, statusGroup, page: 1 }))
