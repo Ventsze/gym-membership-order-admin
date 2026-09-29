@@ -1,17 +1,16 @@
 import { useMemo, useState } from 'react'
 import {
+  CloseOutlined,
   FileAddOutlined,
   LogoutOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
+  MenuOutlined,
   OrderedListOutlined,
+  TrophyOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Avatar, Breadcrumb, Button, Dropdown, Layout, Menu, Space } from 'antd'
+import { Avatar, Breadcrumb, Button, Dropdown, Menu, Space } from 'antd'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
-
-const { Header, Sider, Content } = Layout
 
 const menuItems = [
   { key: '/orders', icon: <OrderedListOutlined />, label: '订单列表' },
@@ -24,7 +23,7 @@ const pageNames = {
 }
 
 export function AdminLayout() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { username, logout } = useAuthStore()
@@ -43,45 +42,58 @@ export function AdminLayout() {
   }
 
   return (
-    <Layout className="app-shell">
-      <Sider
-        className="app-sider"
-        width={240}
-        collapsedWidth={80}
-        collapsed={collapsed}
-        trigger={null}
-      >
+    <div className="app-shell">
+      {mobileMenuOpen && (
+        <button
+          className="mobile-overlay"
+          aria-label="关闭菜单"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+      <aside className={`app-sider ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="brand" onClick={() => navigate('/orders')}>
-          <div className="brand-mark">Y</div>
-          {!collapsed && (
-            <div>
-              <div className="brand-name">跃动健身</div>
-              <div className="brand-subtitle">MEMBER OPS</div>
-            </div>
-          )}
+          <div className="brand-mark">
+            <TrophyOutlined />
+          </div>
+          <div>
+            <div className="brand-name">跃动会员管理</div>
+            <div className="brand-subtitle">MEMBER OPERATIONS</div>
+          </div>
         </div>
         <Menu
           mode="inline"
           selectedKeys={[selectedKey]}
           items={menuItems}
-          onClick={({ key }) => navigate(key)}
+          onClick={({ key }) => {
+            navigate(key)
+            setMobileMenuOpen(false)
+          }}
         />
-        {!collapsed && (
+        <div className="sider-footer">
           <div className="sider-footnote">
             <span className="online-dot" />
             模拟服务运行中
           </div>
-        )}
-      </Sider>
-      <Layout>
-        <Header className="app-header">
+          <Button
+            block
+            className="sidebar-logout"
+            icon={<LogoutOutlined />}
+            onClick={handleLogout}
+          >
+            退出登录
+          </Button>
+        </div>
+      </aside>
+      <div className="app-content-shell">
+        <header className="app-header">
           <Button
             type="text"
-            className="collapse-button"
-            aria-label={collapsed ? '展开侧栏' : '收起侧栏'}
-            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-            onClick={() => setCollapsed((value) => !value)}
+            className="mobile-menu-button"
+            aria-label={mobileMenuOpen ? '关闭菜单' : '打开菜单'}
+            icon={mobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
+            onClick={() => setMobileMenuOpen((value) => !value)}
           />
+          <Breadcrumb items={breadcrumbItems} className="page-breadcrumb" />
           <Dropdown
             menu={{
               items: [
@@ -102,12 +114,11 @@ export function AdminLayout() {
               </Space>
             </Button>
           </Dropdown>
-        </Header>
-        <Content className="app-main">
-          <Breadcrumb items={breadcrumbItems} className="page-breadcrumb" />
+        </header>
+        <main className="app-main">
           <Outlet />
-        </Content>
-      </Layout>
-    </Layout>
+        </main>
+      </div>
+    </div>
   )
 }
