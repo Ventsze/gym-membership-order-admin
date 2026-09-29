@@ -2,6 +2,35 @@
 
 一个基于 React 18 + Vite 构建的健身房会员办卡订单管理后台。项目覆盖登录鉴权、订单筛选与分页、新建订单、跨页批量续卡、一键撤单，以及面向财务对账的受限 CSV 导出。
 
+## 项目预览
+
+![登录、订单列表、新建订单与续卡折扣操作演示](docs/images/workflow-demo.gif)
+
+<details>
+<summary>展开查看完整页面截图</summary>
+
+### 登录页
+
+![左右分栏的系统登录页](docs/images/login-page.jpg)
+
+### 订单列表
+
+![包含筛选、批量操作与分页的订单列表](docs/images/orders-page.jpg)
+
+### 新建订单
+
+![实时计算办卡费用的新建订单表单](docs/images/new-order-page.jpg)
+
+### 续卡折扣
+
+![续卡五年自动应用八折的确认弹窗](docs/images/renewal-discount.jpg)
+
+### 移动端适配
+
+<img src="docs/images/mobile-orders.jpg" alt="移动端订单列表响应式布局" width="390" />
+
+</details>
+
 ## 启动步骤
 
 环境建议：Node.js 20.19+ 或 22.12+，npm 10+。
@@ -57,6 +86,7 @@ npm run preview       # 本地预览生产构建
 
 ```text
 gym-membership-order-admin/
+├── docs/images/             # README 截图与操作演示 GIF
 ├── public/                  # favicon 等静态资源
 ├── src/
 │   ├── api/                 # Axios 实例、订单接口、内存 Mock Adapter
